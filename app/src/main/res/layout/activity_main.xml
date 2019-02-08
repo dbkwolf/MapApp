@@ -10,21 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/background"
+        android:src="@drawable/bg"
 
         />
 
     <Button
         android:id="@+id/btnMap"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:background="#7ed8d8d6"
+
+        android:background="#7e0a604c"
         android:text="Map"
-        android:textColor="#fff"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
 
 </android.support.constraint.ConstraintLayout>

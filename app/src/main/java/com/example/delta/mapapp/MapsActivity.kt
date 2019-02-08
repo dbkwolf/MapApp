@@ -72,7 +72,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    fun init() {
+    private fun init() {
         Log.d(TAG, "init:initializing")
         searchLocationText.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(textView: TextView, actionId: Int, keyEvent: KeyEvent): Boolean {

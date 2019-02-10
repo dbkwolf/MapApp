@@ -2,6 +2,8 @@ package com.example.delta.mapapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import android.speech.RecognizerIntent
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -18,6 +21,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,6 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import java.io.IOException
+import java.util.*
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
@@ -48,17 +53,20 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         const val FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
         const val LOCATION_PERMISSION_REQUEST_CODE = 1234
         const val DEFAULT_ZOOM: Float = 15f;
+        const val REQUEST_CODE_SPEECH_INPUT = 100
 
     }
 
     //widgets
     private lateinit var searchLocationText: EditText
+    private lateinit var speechToText: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
         searchLocationText = findViewById<EditText>(R.id.input_search)
+        speechToText = findViewById<ImageView>(R.id.voice_search)
 
         getLocationPermission()
 
@@ -83,7 +91,41 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
+        speechToText.setOnClickListener{
+            listening();
+        }
+
+
         hideSoftKeyboard()
+    }
+
+    private fun listening() {
+        val mIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        mIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        mIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        mIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi... Say something!")
+
+        try{
+            startActivityForResult(mIntent, REQUEST_CODE_SPEECH_INPUT)
+        }catch(e: Exception){
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CODE_SPEECH_INPUT->{
+                if(resultCode == Activity.RESULT_OK && null != data){
+                val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                searchLocationText.setText(result[0])
+                geoLocate()
+
+                }
+            }
+        }
     }
 
     private fun geoLocate() {
@@ -144,7 +186,6 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(this, permission, LOCATION_PERMISSION_REQUEST_CODE)
         }
     }
-
 
     /**
      * Manipulates the map once available.
